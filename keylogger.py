@@ -5,16 +5,18 @@ from secuence_keys import secuence_keys
 #modules
 from modules.Clicker import Clicker
 
-clicker = Clicker
-
 
 class Keylogger:
     def __init__(self):
+        self.clicker = Clicker()
+
         self.log = ""
         self.exit_event = asyncio.Event()  
         self.lastEventIsClick = False
 
         self.keys_pressed = []
+
+
 
     def clean_key(self,key):
         special_keys = {
@@ -69,8 +71,10 @@ class Keylogger:
 
     def special_functions(self):
         if any(all(element in self.keys_pressed for element in combination) for combination in secuence_keys['Start Clicker']):
-            print('Worksssssss')
-        
+            asyncio.run(self.clicker.start_clicker())
+        elif any(all(element in self.keys_pressed for element in combination) for combination in secuence_keys['End Clicker']):
+            self.clicker.stop_clicker()
+
 
 
     def on_press(self,key):
@@ -114,12 +118,12 @@ class Keylogger:
         self.lastEventIsClick = False"""
 
 
-    def on_release(self,key):
+    def on_release(self, key):
         try:
             self.keys_pressed.remove(self.clean_key(key))
-        except:
-            pass
-        #print('on_release')
+        except Exception as e:
+            print(f"Error en on_release: {e}")
+
 
     def on_click(self,x, y, button, pressed):
         # Tu lógica aquí para manejar el evento de clic
@@ -138,8 +142,8 @@ class Keylogger:
         # Iniciar las tareas como objetos asyncio.Task
         task_keyboard = asyncio.create_task(self.listenKeyboard())
         task_mouse = asyncio.create_task(self.listenMouse())
-
-        # Esperar que ambas tareas se completen
+        
+        # Esperar que todas las tareas se completen
         await asyncio.gather(task_keyboard, task_mouse)
 
 # Ejecutar el bucle de eventos de asyncio
