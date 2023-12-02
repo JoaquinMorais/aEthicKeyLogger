@@ -1,6 +1,11 @@
 from pynput.keyboard import Listener as KeyboardListener, Key
 from pynput.mouse import Listener as MouseListener
 import asyncio
+from secuence_keys import secuence_keys
+#modules
+from modules.Clicker import Clicker
+
+clicker = Clicker
 
 
 class Keylogger:
@@ -9,8 +14,9 @@ class Keylogger:
         self.exit_event = asyncio.Event()  
         self.lastEventIsClick = False
 
+        self.keys_pressed = []
 
-    def on_press(self,key):
+    def clean_key(self,key):
         special_keys = {
             Key.enter: 'Enter',
             Key.esc: 'Esc',
@@ -40,8 +46,44 @@ class Keylogger:
             Key.f10 : 'F10',
             Key.f11 : 'F11',
             Key.f12 : 'F12',
+            Key.print_screen : 'Print Screen',
+            Key.scroll_lock : 'Scroll_Lock',
+            Key.pause : 'Pause',
+            Key.insert : 'Insert',
+            Key.home : 'Home',
+            Key.page_up : 'Page Up',
+            Key.delete : 'Delete',
+            Key.end : 'End',
+            Key.page_down : 'Page Down',
+            Key.menu : 'Menu',
+            Key.alt_gr : 'Alt Gr',
+            
         }
         if key in special_keys:
+            return special_keys[key]
+        else:
+            char = getattr(key, 'char', None)
+            if char is not None:
+                return char
+            return key
+
+    def special_functions(self):
+        if any(all(element in self.keys_pressed for element in combination) for combination in secuence_keys['Start Clicker']):
+            print('Worksssssss')
+        
+
+
+    def on_press(self,key):
+        key = self.clean_key(key)
+        if key not in self.keys_pressed:
+            self.keys_pressed.append(key)
+        print(self.keys_pressed)
+
+        
+        self.special_functions()
+
+
+        """if key in special_keys:
             if special_keys[key] == 'Space':
                 self.log+=' '
 
@@ -69,11 +111,14 @@ class Keylogger:
             except AttributeError:
                 print(f'on_press {key} type: {type(key)}')
 
-        self.lastEventIsClick = False
+        self.lastEventIsClick = False"""
 
 
     def on_release(self,key):
-        pass
+        try:
+            self.keys_pressed.remove(self.clean_key(key))
+        except:
+            pass
         #print('on_release')
 
     def on_click(self,x, y, button, pressed):
