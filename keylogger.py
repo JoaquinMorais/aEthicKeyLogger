@@ -71,9 +71,12 @@ class Keylogger:
 
     def special_functions(self):
         if any(all(element in self.keys_pressed for element in combination) for combination in secuence_keys['Start Clicker']):
-            asyncio.run(self.clicker.start_clicker())
-        elif any(all(element in self.keys_pressed for element in combination) for combination in secuence_keys['End Clicker']):
+            #asyncio.run(self.clicker.start_clicker())
+            self.clicker.start_clicker()
+        elif any(all(element in self.keys_pressed for element in combination) for combination in secuence_keys['Stop Clicker']):
             self.clicker.stop_clicker()
+        elif any(all(element in self.keys_pressed for element in combination) for combination in secuence_keys['End Clicker']):
+            self.clicker.end_clicker()
 
 
 
@@ -144,7 +147,11 @@ class Keylogger:
         task_mouse = asyncio.create_task(self.listenMouse())
         
         # Esperar que todas las tareas se completen
-        await asyncio.gather(task_keyboard, task_mouse)
+        await asyncio.gather(
+            task_keyboard, 
+            task_mouse,
+            self.clicker.main()
+        )
 
 # Ejecutar el bucle de eventos de asyncio
 if __name__ == '__main__':

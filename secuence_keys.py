@@ -3,8 +3,12 @@ secuence_keys = {
         ['Home','Shift','c'],
         ['Home','Shift','C']
     ],
-    'End Clicker' : [
+    'Stop Clicker' : [
         ['End','Shift','c'],
         ['End','Shift','C']
-    ]
+    ],
+    'End Clicker' : [
+        ['Delete','Shift','c'],
+        ['Delete','Shift','C']
+    ],
 }

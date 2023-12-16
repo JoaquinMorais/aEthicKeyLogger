@@ -4,9 +4,10 @@ import time
 import asyncio
 
 class Clicker:
-    def __init__(self, delay=1):
+    def __init__(self, delay=0.01):
         self.delay = delay
-        self.stop_requested = False
+        self.request_click = False
+        self.turn_on = True
 
     def click(self):
         pg.click()
@@ -19,20 +20,32 @@ class Clicker:
             time.sleep(self.delay)
         print("Clicker completado.")
 
-    async def start_clicker(self):
+    def start_clicker(self):
         print("Iniciando clicker. Presiona ['End' - 'Shift' - 'C'] para detener.")
-        while not self.stop_requested:
-            pg.click()
-            await asyncio.sleep(self.delay)
+        self.request_click = True
 
     def stop_clicker(self):
-        print("Terminando clicker.")
-        self.stop_requested = True
+        print("Pausando clicker.")
+        self.request_click = False
+
+    def end_clicker(self):
+        print("Finalizado clicker.")
+        self.turn_on = False
+
+    async def clicker(self):
+        while self.turn_on:
+            print('intento')
+            while self.request_click:
+                pg.click()
+                pg.click()
+                await asyncio.sleep(self.delay)
+            await asyncio.sleep(5)
+
 
     async def main(self):
         # Iniciar las tareas como objetos asyncio.Task
-        task_start_clicker = asyncio.create_task(self.start_clicker())
-        task_stop_clicker = asyncio.create_task(self.stop_clicker())
+        _clicker_ = asyncio.create_task(self.clicker())
         
+        return _clicker_
         # Esperar que ambas tareas se completen
-        await asyncio.gather(task_start_clicker, task_stop_clicker)
+        #await asyncio.gather(task_start_clicker, task_stop_clicker)
